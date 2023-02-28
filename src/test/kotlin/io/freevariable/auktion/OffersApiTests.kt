@@ -4,6 +4,7 @@ import io.freevariable.auktion.model.Offer
 import io.freevariable.auktion.repository.OfferRepository
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,14 +27,20 @@ class OffersApiTests {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @BeforeAll
+    @BeforeEach
     fun setup() {
         repository.deleteAll()
     }
 
     @Test
     fun listOffers() {
-        val offer = Offer(title = "Test Offer", description = "This is a test offer", price = 100, password="password", open = true)
+        val offer = Offer(
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
         repository.save(offer)
 
         mockMvc.get("/offers").andExpect {
@@ -49,8 +56,14 @@ class OffersApiTests {
     }
 
     @Test
-    fun listOpenOffers() {
-        val offer = Offer(title = "Test Offer", description = "This is a test offer", price = 100, password="password", open = true)
+    fun searchOpenOffers() {
+        val offer = Offer(
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
         repository.save(offer)
 
         mockMvc.get("/offers/search/by-status?open=true").andExpect {
@@ -67,7 +80,13 @@ class OffersApiTests {
 
     @Test
     fun createOffer() {
-        val offer = Offer(title = "Test Offer", description = "This is a test offer", price = 100, password="password", open = true)
+        val offer = Offer(
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
         repository.save(offer)
 
         mockMvc.post("/offers") {
