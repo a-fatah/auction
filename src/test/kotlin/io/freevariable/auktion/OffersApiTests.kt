@@ -3,6 +3,7 @@ package io.freevariable.auktion
 import io.freevariable.auktion.model.Offer
 import io.freevariable.auktion.repository.OfferRepository
 import org.hamcrest.Matchers.hasSize
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -120,7 +121,10 @@ class OffersApiTests {
         )
         repository.save(offer)
 
-        mockMvc.get("/offers/1").andExpect {
+        // get first offer from repository and use its id
+        val first = repository.findAll().first()
+
+        mockMvc.get("/offers/${first.id}").andExpect {
             status { isOk() }
             content { contentType("application/hal+json") }
             jsonPath("$.title") { value("Test Offer") }
