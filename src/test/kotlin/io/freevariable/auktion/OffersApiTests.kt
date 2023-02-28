@@ -4,6 +4,7 @@ import io.freevariable.auktion.model.Bid
 import io.freevariable.auktion.model.Offer
 import io.freevariable.auktion.repository.BidRepository
 import io.freevariable.auktion.repository.OfferRepository
+import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -163,7 +164,6 @@ class OffersApiTests {
     @Test
     fun `given a bid is made, when get offer, then return bid`() {
         var offer = Offer(
-            id = 1,
             title = "Test Offer",
             description = "This is a test offer",
             price = 100,
@@ -174,7 +174,6 @@ class OffersApiTests {
 
         // create a Bid
         var bid = Bid(
-            id = 1,
             offer = offer,
             buyerName = "Test Buyer",
             amount = 100
@@ -199,7 +198,6 @@ class OffersApiTests {
     @Test
     fun `given a bid is made, when close offer, then closed`() {
         var offer = Offer(
-            id = 1,
             title = "Test Offer",
             description = "This is a test offer",
             price = 100,
@@ -210,7 +208,6 @@ class OffersApiTests {
 
         // create a Bid
         var bid = Bid(
-            id = 1,
             offer = offer,
             buyerName = "Test Buyer",
             amount = 100
@@ -262,7 +259,6 @@ class OffersApiTests {
     @Test
     fun `given valid bid, when create bid, then return 204`() {
         var offer = Offer(
-            id = 1,
             title = "Test Offer",
             description = "This is a test offer",
             price = 100,
@@ -279,11 +275,13 @@ class OffersApiTests {
             content = """
                 {
                     "buyerName": "Test Buyer",
+                    "bidPassword": "password",
                     "amount": 100
                 }
             """.trimIndent()
         }.andExpect {
-            status { isNoContent() }
+            status { isCreated() }
+            header { string("Location", containsString("/offers/${offer.id}/bids/")) }
         }.andDo { print() }
 
     }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import java.net.URI
 
 @RepositoryRestController
 class OfferController(private val projectionFactory: ProjectionFactory) {
@@ -29,12 +30,14 @@ class OfferController(private val projectionFactory: ProjectionFactory) {
     data class CreateBidRequest(val buyerName: String, val bidPassword: String, val amount: Int)
 
     @PostMapping("/offers/{id}/bids")
-    fun createBid(@RequestBody bid: CreateBidRequest, @PathVariable("id") offerId: Long): ResponseEntity<Bid> {
+    fun createBid(@RequestBody bid: CreateBidRequest, @PathVariable("id") offerId: Long): ResponseEntity<String> {
 
         val createdBid = offerService.createBid(offerId, bid.buyerName, bid.bidPassword, bid.amount)
             ?: return ResponseEntity.notFound().build()
 
-        return ResponseEntity.ok().body(createdBid)
+        val uri = "/offers/$offerId/bids/${createdBid.id}"
+
+        return ResponseEntity.created(URI.create(uri)).body("Bid created!")
     }
 
     data class CloseOfferRequest(val password: String, val selectedBid: Long)
