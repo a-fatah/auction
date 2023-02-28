@@ -8,6 +8,42 @@ For storing data in memory it uses H2 database.
 
 For working with amounts it uses Integer type and stores amounts in cents.
 
+It uses following libraries/frameworks:
+
+* Spring Boot - for application bootstrapping
+* Spring Data JPA - for data access
+* Spring Data REST (HAL) - for exposing REST API
+* JUnit 5 - for testing
+* Jib - for building Docker images
+* H2 - for storing data in memory
+* Gradle - for building the application
+* Docker - for building Docker images
+
+### Features
+
+* Create an offer
+* Update an offer
+* Delete an offer
+* Close an offer
+* Create a bid
+* Get all offers
+* Get all bids
+* Get all bids for an offer
+* Get an offer by id
+* Get a bid by id
+* Get a bid by id for an offer
+* Close an offer
+
+
+### Requirements
+
+* Java 11
+* Docker (optional)
+* Gradle (optional)
+* Docker Compose (optional)
+* Postman (optional)
+* IntelliJ IDEA (optional)
+
 ### API Documentation
 
 GET /offers - returns all offers
