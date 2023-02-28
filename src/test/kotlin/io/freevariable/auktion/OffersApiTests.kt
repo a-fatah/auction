@@ -63,7 +63,26 @@ class OffersApiTests {
     }
 
     @Test
-    fun searchOpenOffers() {
+    fun `given offers are open, when search for closed offers, then return no offers`() {
+        val offer = Offer(
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        offerRepository.save(offer)
+
+        mockMvc.get("/offers/search/by-status?open=false").andExpect {
+            status { isOk() }
+            content { contentType("application/hal+json") }
+            jsonPath("$._embedded.offers", hasSize<Int>(0))
+        }
+
+    }
+
+    @Test
+    fun `given offers are open, when search for open offers, then return offers`() {
         val offer = Offer(
             title = "Test Offer",
             description = "This is a test offer",
@@ -87,7 +106,7 @@ class OffersApiTests {
     }
 
     @Test
-    fun createOffer() {
+    fun `given valid offer, when create offer, then return 201`() {
         val offer = Offer(
             title = "Test Offer",
             description = "This is a test offer",
@@ -115,7 +134,7 @@ class OffersApiTests {
     }
 
     @Test
-    fun getOffer() {
+    fun `given an offer exists, when get offer, then return offer`() {
         val offer = Offer(
             id = 1,
             title = "Test Offer",
@@ -142,7 +161,43 @@ class OffersApiTests {
     }
 
     @Test
-    fun closeOffer() {
+    fun `given a bid is made, when get offer, then return bid`() {
+        var offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        offerRepository.save(offer)
+
+        // create a Bid
+        var bid = Bid(
+            id = 1,
+            offer = offer,
+            buyerName = "Test Buyer",
+            amount = 100
+        )
+
+        bid = bidRepository.save(bid)
+
+        // get first offer from repository and use its id
+        offer = offerRepository.findAll().first()
+
+        mockMvc.get("/offers/${offer.id}/bids").andExpect {
+            status { isOk() }
+            content { contentType("application/hal+json") }
+            jsonPath("$._embedded.bids", hasSize<Int>(1))
+            jsonPath("$._embedded.bids[0].buyerName") { value("Test Buyer") }
+            jsonPath("$._embedded.bids[0].amount") { value(100) }
+        }.andDo { print() }
+
+    }
+
+
+    @Test
+    fun `given a bid is made, when close offer, then closed`() {
         var offer = Offer(
             id = 1,
             title = "Test Offer",
@@ -181,6 +236,7 @@ class OffersApiTests {
         offer = offerRepository.findById(offer.id!!).get()
         assertEquals(false, offer.open)
     }
+
 
     @Test
     fun `given offer is closed, when get offer, then return 404`() {
