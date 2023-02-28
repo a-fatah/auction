@@ -232,4 +232,63 @@ class OffersApiTests {
 
     }
 
+    @Test
+    fun `given invalid bid, when create bid, then return 400`() {
+        var offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        offerRepository.save(offer)
+
+        // get first offer from repository and use its id
+        offer = offerRepository.findAll().first()
+
+        mockMvc.post("/offers/${offer.id}/bids") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                    "buyerName": "Test Buyer",
+                    "amount": 50
+                }
+            """.trimIndent()
+        }.andExpect {
+            status { isBadRequest() }
+        }.andDo { print() }
+
+    }
+
+    @Test
+    fun `given offer is closed, when create bid, then return 400`() {
+        var offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = false
+        )
+        offerRepository.save(offer)
+
+        // get first offer from repository and use its id
+        offer = offerRepository.findAll().first()
+
+        mockMvc.post("/offers/${offer.id}/bids") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                    "buyerName": "Test Buyer",
+                    "bidPassword": "password",
+                    "amount": 100
+                }
+            """.trimIndent()
+        }.andExpect {
+            status { isBadRequest() }
+        }.andDo { print() }
+
+    }
+
 }
