@@ -182,4 +182,25 @@ class OffersApiTests {
         assertEquals(false, offer.open)
     }
 
+    @Test
+    fun `given offer is closed, when get offer, then return 404`() {
+        val offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = false
+        )
+        offerRepository.save(offer)
+
+        // get first offer from repository and use its id
+        val first = offerRepository.findAll().first()
+
+        mockMvc.get("/offers/${first.id}").andExpect {
+            status { isNotFound() }
+        }.andDo { print() }
+
+    }
+
 }
