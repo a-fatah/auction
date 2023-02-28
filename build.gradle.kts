@@ -6,11 +6,20 @@ plugins {
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
 	kotlin("plugin.jpa") version "1.6.21"
+	id("com.google.cloud.tools.jib") version "3.1.4"
 }
 
 group = "io.freevariable"
 version = "0.0.1-SNAPSHOT"
+val buildNumber by extra("0")
 java.sourceCompatibility = JavaVersion.VERSION_11
+
+jib {
+	to {
+		image = "auktion"
+		tags = setOf("$version", "$version.${extra["buildNumber"]}")
+	}
+}
 
 repositories {
 	mavenCentral()
