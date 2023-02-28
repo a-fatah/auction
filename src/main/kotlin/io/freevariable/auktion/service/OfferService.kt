@@ -5,6 +5,7 @@ import io.freevariable.auktion.model.Bid
 import io.freevariable.auktion.model.Offer
 import io.freevariable.auktion.repository.BidRepository
 import io.freevariable.auktion.repository.OfferRepository
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -13,6 +14,7 @@ interface OfferService {
     fun closeOffer(offerId: Long, password: String, selectedBid: Long)
     fun getOffer(offerId: Long): Offer?
     fun createBid(offerId: Long, buyerName: String, bidPassword: String, amount: Int): Bid?
+    fun createOffer(title: String, description: String, price: Int, password: String): Offer
 }
 
 @Service
@@ -24,7 +26,7 @@ class OfferServiceImpl(
     @Transactional
     override fun closeOffer(offerId: Long, password: String, selectedBid: Long) {
         val offer = offerRepository.findById(offerId).orElseThrow { OfferNotFoundException() }
-        if (offer.password != password) {
+        if (checkPassword(password, offer.password)) {
             throw BidPasswordIncorrectException()
         }
 
@@ -43,7 +45,7 @@ class OfferServiceImpl(
 
     override fun createBid(offerId: Long, buyerName: String, bidPassword: String, amount: Int): Bid? {
         val offer = offerRepository.findById(offerId).orElseThrow { OfferNotFoundException() }
-        if (offer.password != bidPassword) {
+        if (checkPassword(bidPassword, offer.password)) {
             throw BidPasswordIncorrectException()
         }
 
@@ -55,5 +57,17 @@ class OfferServiceImpl(
 
         val bid = Bid(offer = offer, buyerName = buyerName, amount = amount)
         return bidRepository.save(bid)
+    }
+
+    override fun createOffer(title: String, description: String, price: Int, password: String): Offer {
+        val encoder = BCryptPasswordEncoder()
+        val password = encoder.encode(password)
+        val offer = Offer(title = title, description = description, price = price, password = password, open = true)
+        return offerRepository.save(offer)
+    }
+
+    fun checkPassword(password: String, encodedPassword: String): Boolean {
+        val encoder = BCryptPasswordEncoder()
+        return encoder.matches(password, encodedPassword)
     }
 }

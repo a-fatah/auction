@@ -1,6 +1,7 @@
 package io.freevariable.auktion.controller
 
 import io.freevariable.auktion.model.Bid
+import io.freevariable.auktion.model.Offer
 import io.freevariable.auktion.service.OfferService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.projection.ProjectionFactory
@@ -18,6 +19,13 @@ class OfferController(private val projectionFactory: ProjectionFactory) {
 
     @Autowired
     lateinit var offerService: OfferService
+
+    @PostMapping("/offers")
+    fun createOffer(@RequestBody offer: Offer): ResponseEntity<String> {
+        val createdOffer = offerService.createOffer(offer.title, offer.description, offer.price, offer.password)
+        val uri = "/offers/${createdOffer.id}"
+        return ResponseEntity.created(URI.create(uri)).body("Offer created!")
+    }
 
     @GetMapping("/offers/{id}")
     fun getOffer(@PathVariable("id") offerId: Long): ResponseEntity<OfferView> {
