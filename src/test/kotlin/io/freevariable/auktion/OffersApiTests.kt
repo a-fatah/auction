@@ -203,4 +203,33 @@ class OffersApiTests {
 
     }
 
+    @Test
+    fun `given valid bid, when create bid, then return 204`() {
+        var offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        offerRepository.save(offer)
+
+        // get first offer from repository and use its id
+        offer = offerRepository.findAll().first()
+
+        mockMvc.post("/offers/${offer.id}/bids") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                    "buyerName": "Test Buyer",
+                    "amount": 100
+                }
+            """.trimIndent()
+        }.andExpect {
+            status { isNoContent() }
+        }.andDo { print() }
+
+    }
+
 }
