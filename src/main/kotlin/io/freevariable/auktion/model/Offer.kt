@@ -11,5 +11,6 @@ data class Offer(
     val title: String,
     val description: String,
     val price: Int,
-    val password: String
+    val password: String,
+    val open: Boolean
 )

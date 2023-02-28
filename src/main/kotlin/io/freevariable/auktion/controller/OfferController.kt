@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 class OfferController(private val offerRepository: OfferRepository) {
 
     @GetMapping
-    fun getAllOffers() = offerRepository.findAll()
+    fun getAllOffers() = offerRepository.findByOpen(true)
 
     @GetMapping("/{id}")
     fun getOfferById(@PathVariable id: Long) = offerRepository.findById(id)
