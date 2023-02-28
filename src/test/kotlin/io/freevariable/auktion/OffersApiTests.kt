@@ -51,6 +51,7 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].description") { value("This is a test offer") }
             jsonPath("$._embedded.offers[0].price") { value(100) }
             jsonPath("$._embedded.offers[0].open") { value(true) }
+            jsonPath("$._embedded.offers[0].password") { doesNotExist() }
         }
 
     }
@@ -74,6 +75,7 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].description") { value("This is a test offer") }
             jsonPath("$._embedded.offers[0].price") { value(100) }
             jsonPath("$._embedded.offers[0].open") { value(true) }
+            jsonPath("$._embedded.offers[0].password") { doesNotExist() }
         }
 
     }
@@ -103,6 +105,30 @@ class OffersApiTests {
         }.andExpect {
             status { isCreated() }
         }
+
+    }
+
+    @Test
+    fun getOffer() {
+        val offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        repository.save(offer)
+
+        mockMvc.get("/offers/1").andExpect {
+            status { isOk() }
+            content { contentType("application/hal+json") }
+            jsonPath("$.title") { value("Test Offer") }
+            jsonPath("$.description") { value("This is a test offer") }
+            jsonPath("$.price") { value(100) }
+            jsonPath("$.open") { value(true) }
+            jsonPath("$._embedded.offers[0].password") { doesNotExist() }
+        }.andDo { print() }
 
     }
 
