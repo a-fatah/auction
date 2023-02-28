@@ -1,13 +1,12 @@
 package io.freevariable.auktion.model
 
-import org.springframework.data.jpa.repository.JpaRepository
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
 @Entity
 data class Offer(
-    @Id @GeneratedValue val id: Long,
+    @Id @GeneratedValue val id: Long? = null,
     val title: String,
     val description: String,
     val price: Int,
