@@ -1,10 +1,11 @@
 package io.freevariable.auktion
 
+import io.freevariable.auktion.model.Bid
 import io.freevariable.auktion.model.Offer
+import io.freevariable.auktion.repository.BidRepository
 import io.freevariable.auktion.repository.OfferRepository
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 
 
 @SpringBootTest
@@ -23,14 +25,17 @@ import org.springframework.test.web.servlet.post
 class OffersApiTests {
 
     @Autowired
-    private lateinit var repository: OfferRepository
+    private lateinit var offerRepository: OfferRepository
+
+    @Autowired
+    private lateinit var bidRepository: BidRepository
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @BeforeEach
     fun setup() {
-        repository.deleteAll()
+        offerRepository.deleteAll()
     }
 
     @Test
@@ -42,7 +47,7 @@ class OffersApiTests {
             password = "password",
             open = true
         )
-        repository.save(offer)
+        offerRepository.save(offer)
 
         mockMvc.get("/offers").andExpect {
             status { isOk() }
@@ -66,7 +71,7 @@ class OffersApiTests {
             password = "password",
             open = true
         )
-        repository.save(offer)
+        offerRepository.save(offer)
 
         mockMvc.get("/offers/search/by-status?open=true").andExpect {
             status { isOk() }
@@ -90,7 +95,7 @@ class OffersApiTests {
             password = "password",
             open = true
         )
-        repository.save(offer)
+        offerRepository.save(offer)
 
         mockMvc.post("/offers") {
             contentType = MediaType.APPLICATION_JSON
@@ -119,10 +124,10 @@ class OffersApiTests {
             password = "password",
             open = true
         )
-        repository.save(offer)
+        offerRepository.save(offer)
 
         // get first offer from repository and use its id
-        val first = repository.findAll().first()
+        val first = offerRepository.findAll().first()
 
         mockMvc.get("/offers/${first.id}").andExpect {
             status { isOk() }
@@ -134,6 +139,47 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
         }.andDo { print() }
 
+    }
+
+    @Test
+    fun closeOffer() {
+        var offer = Offer(
+            id = 1,
+            title = "Test Offer",
+            description = "This is a test offer",
+            price = 100,
+            password = "password",
+            open = true
+        )
+        offerRepository.save(offer)
+
+        // create a Bid
+        var bid = Bid(
+            id = 1,
+            offer = offer,
+            buyerName = "Test Buyer",
+            amount = 100
+        )
+
+        bid = bidRepository.save(bid)
+
+        // get first offer from repository and use its id
+        offer = offerRepository.findAll().first()
+
+        mockMvc.put("/offers/${offer.id}/close") {
+            contentType = MediaType.APPLICATION_JSON
+            content = """
+                {
+                    "selectedBid": ${bid.id},
+                    "password": "password"
+                }
+            """.trimIndent()
+        }.andExpect {
+            status { isOk() }
+        }.andDo { print() }
+
+        offer = offerRepository.findById(offer.id!!).get()
+        assertEquals(false, offer.open)
     }
 
 }
