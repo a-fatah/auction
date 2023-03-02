@@ -9,20 +9,26 @@ import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.put
+import org.springframework.restdocs.RestDocumentationContextProvider
+import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.snippet.Snippet
+import org.springframework.test.web.servlet.*
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureRestDocs
 class OffersApiTests {
 
     @Autowired
@@ -31,16 +37,27 @@ class OffersApiTests {
     @Autowired
     private lateinit var bidRepository: BidRepository
 
-    @Autowired
     private lateinit var mockMvc: MockMvc
 
+    @RegisterExtension
+    val restDocumentation = RestDocumentationExtension("build/generated-snippets")
+
     @BeforeEach
-    fun setup() {
+    fun setup(
+        wacContext: WebApplicationContext,
+        restDocumentation: RestDocumentationContextProvider
+    ) {
+
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(wacContext)
+            .apply<DefaultMockMvcBuilder>(documentationConfiguration(restDocumentation))
+            .build()
+
+
         offerRepository.deleteAll()
     }
 
     @Test
-    fun listOffers() {
+    fun `given offers, when list offers, then returns offers`() {
         val offer = Offer(
             title = "Test Offer",
             description = "This is a test offer",
@@ -59,6 +76,8 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].price") { value(100) }
             jsonPath("$._embedded.offers[0].open") { value(true) }
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
+        }.andDo {
+            document("list-offers")
         }
 
     }
@@ -78,7 +97,7 @@ class OffersApiTests {
             status { isOk() }
             content { contentType("application/hal+json") }
             jsonPath("$._embedded.offers", hasSize<Int>(0))
-        }
+        }.andDo { document("search-closed-offers") }
 
     }
 
@@ -102,7 +121,7 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].price") { value(100) }
             jsonPath("$._embedded.offers[0].open") { value(true) }
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
-        }
+        }.andDo { document("search-open-offers") }
 
     }
 
@@ -130,7 +149,7 @@ class OffersApiTests {
             """.trimIndent()
         }.andExpect {
             status { isCreated() }
-        }
+        }.andDo { document("create-offer") }
 
     }
 
@@ -157,7 +176,7 @@ class OffersApiTests {
             jsonPath("$.price") { value(100) }
             jsonPath("$.open") { value(true) }
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
-        }.andDo { print() }
+        }
 
     }
 
@@ -190,7 +209,7 @@ class OffersApiTests {
             jsonPath("$._embedded.bids", hasSize<Int>(1))
             jsonPath("$._embedded.bids[0].buyerName") { value("Test Buyer") }
             jsonPath("$._embedded.bids[0].amount") { value(100) }
-        }.andDo { print() }
+        }.andDo { document("get-offer-with-bids") }
 
     }
 
@@ -228,7 +247,7 @@ class OffersApiTests {
             """.trimIndent()
         }.andExpect {
             status { isOk() }
-        }.andDo { print() }
+        }.andDo { document("close-offer") }
 
         offer = offerRepository.findById(offer.id!!).get()
         assertEquals(false, offer.open)
@@ -252,7 +271,7 @@ class OffersApiTests {
 
         mockMvc.get("/offers/${first.id}").andExpect {
             status { isNotFound() }
-        }.andDo { print() }
+        }.andDo { document("get-closed-offer") }
 
     }
 
@@ -282,7 +301,7 @@ class OffersApiTests {
         }.andExpect {
             status { isCreated() }
             header { string("Location", containsString("/offers/${offer.id}/bids/")) }
-        }.andDo { print() }
+        }.andDo { document("create-bid") }
 
     }
 
@@ -311,7 +330,7 @@ class OffersApiTests {
             """.trimIndent()
         }.andExpect {
             status { isBadRequest() }
-        }.andDo { print() }
+        }
 
     }
 
@@ -341,8 +360,12 @@ class OffersApiTests {
             """.trimIndent()
         }.andExpect {
             status { isBadRequest() }
-        }.andDo { print() }
+        }.andDo { document("create-bid-closed-offer") }
 
+    }
+
+    fun MockMvcResultHandlersDsl.document(identifier: String, vararg snippets: Snippet) {
+        handle(MockMvcRestDocumentation.document(identifier, *snippets))
     }
 
 }
