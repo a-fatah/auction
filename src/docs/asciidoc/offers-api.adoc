@@ -26,6 +26,8 @@ Returns all offers.
 
 include::{snippets}/list-offers/http-request.adoc[]
 
+Response:
+include::{snippets}/list-offers/http-response.adoc[]
 
 === GET /offers/search/by-status?open={status}
 
@@ -33,6 +35,8 @@ Returns all offers with the given open status.
 
 include::{snippets}/search-open-offers/http-request.adoc[]
 
+Response:
+include::{snippets}/search-open-offers/http-response.adoc[]
 
 === GET /offers/{id}
 
@@ -40,6 +44,8 @@ Returns the offer with the given ID.
 
 include::{snippets}/get-offer/http-request.adoc[]
 
+Response:
+include::{snippets}/get-offer/http-response.adoc[]
 
 === GET /offers/{id}/bids
 
@@ -47,6 +53,8 @@ Returns all bids for the offer with the given ID.
 
 include::{snippets}/get-offer-with-bids/http-request.adoc[]
 
+Response:
+include::{snippets}/get-offer-with-bids/http-response.adoc[]
 
 === POST /offers
 
@@ -54,6 +62,8 @@ Creates a new offer.
 
 include::{snippets}/create-offer/http-request.adoc[]
 
+Response:
+include::{snippets}/create-offer/http-response.adoc[]
 
 === POST /offers/{id}/bids
 
@@ -61,6 +71,8 @@ Creates a new bid for the offer with the given ID.
 
 include::{snippets}/create-bid/http-request.adoc[]
 
+Response:
+include::{snippets}/create-bid/http-response.adoc[]
 
 === PUT /offers/{id}/close
 
@@ -68,3 +80,5 @@ Closes the offer with the given ID.
 
 include::{snippets}/close-offer/http-request.adoc[]
 
+Response:
+include::{snippets}/close-offer/http-response.adoc[]
