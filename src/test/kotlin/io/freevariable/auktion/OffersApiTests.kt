@@ -85,14 +85,25 @@ class OffersApiTests {
                     fieldWithPath("_embedded.offers[].id").description("The id of the offer"),
                     fieldWithPath("_embedded.offers[].title").description("The title of the offer"),
                     fieldWithPath("_embedded.offers[].description").description("The description of the offer"),
-                    fieldWithPath("_embedded.offers[].price").description("The price of the offer"),
+                    fieldWithPath("_embedded.offers[].price").description("The price of the offer in cents"),
                     fieldWithPath("_embedded.offers[].open").description("Whether the offer is open for bidding"),
-                    subsectionWithPath("_embedded.offers[]._links")
-                        .description("<<resources-offer-links, Links>> to other resources")
-                        .ignored()
-                        .optional(),
-                    subsectionWithPath("page").description("Pagination details"),
+                    fieldWithPath("page.size").description("The number of offers returned per page"),
+                    fieldWithPath("page.totalElements").description("The total number of offers"),
+                    fieldWithPath("page.totalPages").description("The total number of pages"),
+                    fieldWithPath("page.number").description("The current page number")
                 ),
+                links(
+                    halLinks(),
+                    linkWithRel("selectedBid").description("The link to the selected bid").optional(),
+                    linkWithRel("bids").description("The link to the bids").optional(),
+                    linkWithRel("self").description("The link to this resource"),
+                    linkWithRel("profile").description("The ALPS profile for this resource"),
+                    linkWithRel("search").description("The link to the search resource"),
+                    linkWithRel("next").description("The link to the next page of results").optional(),
+                    linkWithRel("prev").description("The link to the previous page of results").optional(),
+                    linkWithRel("first").description("The link to the first page of results").optional(),
+                    linkWithRel("last").description("The link to the last page of results").optional()
+                )
             )
             document("list-offers-links",
                 relaxedLinks(
