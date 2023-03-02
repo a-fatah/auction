@@ -8,31 +8,31 @@ For storing data in memory it uses H2 database.
 
 For working with amounts it uses Integer type and stores amounts in cents.
 
-It uses following libraries/frameworks:
+It uses following libraries/frameworks/tools:
 
-* Spring Boot - for application bootstrapping
+* Spring Boot 3 - for application configuration
 * Spring Data JPA - for data access
 * Spring Data REST (HAL) - for exposing REST API
-* JUnit 5 - for testing
-* Jib - for building Docker images
+* JUnit Jupiter - for testing
+* MockMVC - for testing REST API
+* Jib Gradle Plugin - for building Docker images
 * H2 - for storing data in memory
 * Gradle - for building the application
 * Docker - for building Docker images
 
 ### Features
 
-* Create an offer
+* Create an offer 
+* Get an offer by id
 * Update an offer
 * Delete an offer
+* Get all offers
+* Search offers by status
 * Close an offer
 * Create a bid
-* Get all offers
+* Get a bid by id
 * Get all bids
 * Get all bids for an offer
-* Get an offer by id
-* Get a bid by id
-* Get a bid by id for an offer
-* Close an offer
 
 
 ### Requirements
@@ -47,6 +47,8 @@ It uses following libraries/frameworks:
 ### API Documentation
 
 GET /offers - returns all offers
+
+GET /offers/search/by-status?open={status} - returns all offers with given open status
 
 GET /offers/{id} - returns offer with given id
 
