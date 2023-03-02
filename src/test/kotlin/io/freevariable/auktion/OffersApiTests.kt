@@ -176,7 +176,7 @@ class OffersApiTests {
             jsonPath("$.price") { value(100) }
             jsonPath("$.open") { value(true) }
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
-        }
+        }.andDo { document("get-offer") }
 
     }
 
