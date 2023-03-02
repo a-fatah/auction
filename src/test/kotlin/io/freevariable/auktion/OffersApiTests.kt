@@ -17,8 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.hypermedia.HypermediaDocumentation.*
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.restdocs.snippet.Snippet
 import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
@@ -77,7 +79,29 @@ class OffersApiTests {
             jsonPath("$._embedded.offers[0].open") { value(true) }
             jsonPath("$._embedded.offers[0].password") { doesNotExist() }
         }.andDo {
-            document("list-offers")
+            document("list-offers",
+                relaxedResponseFields(
+                    fieldWithPath("_embedded.offers[]").description("An array of <<resources-offer, Offer resources>>"),
+                    fieldWithPath("_embedded.offers[].id").description("The id of the offer"),
+                    fieldWithPath("_embedded.offers[].title").description("The title of the offer"),
+                    fieldWithPath("_embedded.offers[].description").description("The description of the offer"),
+                    fieldWithPath("_embedded.offers[].price").description("The price of the offer"),
+                    fieldWithPath("_embedded.offers[].open").description("Whether the offer is open for bidding"),
+                    subsectionWithPath("_embedded.offers[]._links")
+                        .description("<<resources-offer-links, Links>> to other resources")
+                        .ignored()
+                        .optional(),
+                    subsectionWithPath("page").description("Pagination details"),
+                ),
+            )
+            document("list-offers-links",
+                relaxedLinks(
+                    linkWithRel("self").description("The link to this resource"),
+                    linkWithRel("profile").description("The ALPS profile for this resource"),
+                    linkWithRel("search").description("The link to the search resource"),
+                )
+            )
+            print()
         }
 
     }
