@@ -22,12 +22,21 @@ The following endpoints are available in the Offers API:
 
 === GET /offers
 
-Returns all offers.
+Returns all offers. The following example shows the request:
 
 include::{snippets}/list-offers/http-request.adoc[]
 
-Response:
+Example response:
+
 include::{snippets}/list-offers/http-response.adoc[]
+
+The response contains the following information:
+
+include::{snippets}/list-offers/response-fields.adoc[]
+
+Response also contains the following links:
+
+include::{snippets}/list-offers/links.adoc[]
 
 === GET /offers/search/by-status?open={status}
 
