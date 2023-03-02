@@ -1,11 +1,7 @@
 package io.freevariable.auktion.model
 
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
+import jakarta.persistence.*
+
 
 @Entity
 data class Offer(
@@ -17,4 +13,6 @@ data class Offer(
     val open: Boolean,
     @OneToOne(cascade = [CascadeType.ALL]) val selectedBid: Bid? = null,
     @OneToMany(mappedBy = "offer", cascade = [CascadeType.ALL]) val bids: List<Bid> = emptyList()
-)
+) {
+    constructor(): this(null, "", "", 0, "", true, null, emptyList())
+}

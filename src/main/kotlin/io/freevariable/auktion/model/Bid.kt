@@ -1,9 +1,10 @@
 package io.freevariable.auktion.model
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.ManyToOne
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
+
 
 @Entity
 data class Bid(
@@ -11,4 +12,6 @@ data class Bid(
     @ManyToOne val offer: Offer,
     val buyerName: String,
     val amount: Int
-)
+) {
+    constructor(): this(null, Offer(), "", 0)
+}
