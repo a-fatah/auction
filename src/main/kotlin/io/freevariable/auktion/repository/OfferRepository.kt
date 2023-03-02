@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.rest.core.annotation.RepositoryRestResource
 import org.springframework.data.rest.core.annotation.RestResource
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 @RepositoryRestResource(excerptProjection = OfferView::class)
 interface OfferRepository : JpaRepository<Offer, Long> {
