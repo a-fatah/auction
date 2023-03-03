@@ -34,7 +34,7 @@ The response contains the following information:
 
 include::{snippets}/list-offers/response-fields.adoc[]
 
-Response also contains the following links:
+Response also contains the links for performing the following actions:
 
 include::{snippets}/list-offers/links.adoc[]
 

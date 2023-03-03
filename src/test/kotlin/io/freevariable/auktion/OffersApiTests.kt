@@ -92,13 +92,13 @@ class OffersApiTests {
                     fieldWithPath("page.totalPages").description("The total number of pages"),
                     fieldWithPath("page.number").description("The current page number")
                 ),
-                links(
+                relaxedLinks(
                     halLinks(),
-                    linkWithRel("selectedBid").description("The link to the selected bid").optional(),
-                    linkWithRel("bids").description("The link to the bids").optional(),
+                    linkWithRel("selectedBid").description("The link to the selected bid. Available only when the offer is closed").optional(),
+                    linkWithRel("close").description("The link to close the offer. Available only when the offer is open. See <<offer-close, Close Offer>>").optional(),
+                    linkWithRel("bids").description("The link to the bids for this offer").optional(),
                     linkWithRel("self").description("The link to this resource"),
-                    linkWithRel("profile").description("The ALPS profile for this resource"),
-                    linkWithRel("search").description("The link to the search resource"),
+                    linkWithRel("search").description("The link to the search offers resource (see <<offers-search, Offers Search>>)"),
                     linkWithRel("next").description("The link to the next page of results").optional(),
                     linkWithRel("prev").description("The link to the previous page of results").optional(),
                     linkWithRel("first").description("The link to the first page of results").optional(),
@@ -112,7 +112,6 @@ class OffersApiTests {
                     linkWithRel("search").description("The link to the search resource"),
                 )
             )
-            print()
         }
 
     }
